@@ -1,0 +1,582 @@
+B<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>NO ENTRY – Magisystem</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#0b0b0c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="NO ENTRY" />
+
+  <style>
+    :root{
+      --bg:#0b0b0c; --card:#121215; --text:#e9e9ee; --muted:#a7a7b5;
+      --line:#23232a; --ok:#1ed760; --bad:#ff3b30; --warn:#ffd60a;
+      --btn:#1c1c22; --btn2:#2a2a33;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: radial-gradient(900px 600px at 20% 0%, #14141a, transparent),
+                  radial-gradient(900px 600px at 80% 0%, #14141a, transparent),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding:20px 16px 10px;
+      position:sticky; top:0; backdrop-filter: blur(12px);
+      background: linear-gradient(to bottom, rgba(11,11,12,.85), rgba(11,11,12,.35));
+      border-bottom:1px solid rgba(35,35,42,.65);
+      z-index:10;
+    }
+    .title{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+    .title h1{margin:0; font-size:20px; letter-spacing:.04em}
+    .title .sub{color:var(--muted); font-size:12px}
+    .tagline{margin-top:6px; color:var(--muted); font-size:12px}
+    main{padding:14px 16px 80px; max-width:920px; margin:0 auto;}
+    .grid{display:grid; grid-template-columns: 1fr; gap:12px;}
+    .card{
+      background: linear-gradient(180deg, rgba(18,18,21,.95), rgba(18,18,21,.85));
+      border:1px solid rgba(35,35,42,.9);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.35);
+    }
+    .row{display:grid; grid-template-columns:1fr; gap:8px; margin-top:10px}
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    input, textarea, select{
+      width:100%; background:#0f0f12; color:var(--text);
+      border:1px solid rgba(35,35,42,.9); border-radius:12px;
+      padding:11px 12px; font-size:14px; outline:none;
+    }
+    textarea{min-height:74px; resize:vertical}
+    .two{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+    .criteria{display:grid; gap:10px; margin-top:10px}
+    .check{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 10px; border:1px solid rgba(35,35,42,.8); border-radius:14px;
+      background: rgba(15,15,18,.55);
+    }
+    .check input{width:auto; margin-top:2px; transform: scale(1.15)}
+    .check .meta{display:flex; flex-direction:column; gap:3px}
+    .check .meta .name{font-size:13px}
+    .check .meta .desc{font-size:12px; color:var(--muted)}
+    .btnbar{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    button{
+      appearance:none; border:none; cursor:pointer;
+      border-radius: 14px; padding:12px 14px; font-weight:700;
+      color:var(--text); background: var(--btn); border:1px solid rgba(35,35,42,.95);
+    }
+    button.primary{background: linear-gradient(180deg, #232332, #171722); border-color:#2e2e42}
+    button.ghost{background: transparent}
+    button:disabled{opacity:.55; cursor:not-allowed}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:999px; border:1px solid rgba(35,35,42,.9);
+      background: rgba(15,15,18,.55); color:var(--muted); font-size:12px;
+    }
+    .result{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .banner{
+      border-radius: 16px; padding:14px; border:1px solid rgba(35,35,42,.95);
+      background: rgba(15,15,18,.55);
+    }
+    .banner.ok{border-color: rgba(30,215,96,.35); background: rgba(30,215,96,.08)}
+    .banner.bad{border-color: rgba(255,59,48,.35); background: rgba(255,59,48,.07)}
+    .big{
+      font-size:22px; letter-spacing:.06em; margin:0;
+    }
+    .subcopy{margin:2px 0 0; color:var(--muted); font-size:12px}
+    .reasons{margin:0; padding-left:18px; color:var(--text); font-size:13px}
+    .reasons li{margin:6px 0}
+    .ai{display:grid; gap:8px}
+    .ai .line{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:10px 12px; border-radius:14px;
+      border:1px solid rgba(35,35,42,.85);
+      background: rgba(15,15,18,.45);
+      font-size:13px;
+    }
+    .badge{font-size:12px; padding:3px 10px; border-radius:999px; border:1px solid rgba(35,35,42,.85); color:var(--muted)}
+    .badge.ok{border-color: rgba(30,215,96,.4); color: var(--ok)}
+    .badge.bad{border-color: rgba(255,59,48,.4); color: var(--bad)}
+    .phase{
+      display:none; margin-top:10px;
+      padding:12px; border-radius:16px; border:1px dashed rgba(35,35,42,.9);
+      background: rgba(15,15,18,.35); color:var(--muted); font-size:12px;
+    }
+    .phase.show{display:block}
+    .phase .p{margin:6px 0}
+    .divider{height:1px; background: rgba(35,35,42,.75); margin:12px 0}
+    .logs{
+      display:grid; gap:10px; margin-top:10px;
+    }
+    .logitem{
+      padding:12px; border-radius:16px;
+      border:1px solid rgba(35,35,42,.9);
+      background: rgba(15,15,18,.45);
+    }
+    .logtop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
+    .logtitle{margin:0; font-size:13px}
+    .logmeta{color:var(--muted); font-size:12px; margin-top:4px}
+    .logres{font-weight:800; letter-spacing:.04em}
+    .logres.ok{color:var(--ok)}
+    .logres.bad{color:var(--bad)}
+    .small{font-size:12px; color:var(--muted); margin:6px 0 0}
+    .toast{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      background: rgba(20,20,26,.92); border:1px solid rgba(35,35,42,.95);
+      color:var(--text); padding:10px 12px; border-radius: 14px;
+      font-size:13px; display:none; z-index:99;
+      box-shadow: 0 10px 40px rgba(0,0,0,.45);
+      max-width: 92vw;
+    }
+    .toast.show{display:block}
+    footer{
+      position:fixed; left:0; right:0; bottom:0;
+      padding:10px 16px;
+      background: linear-gradient(to top, rgba(11,11,12,.92), rgba(11,11,12,.35));
+      border-top:1px solid rgba(35,35,42,.65);
+      color:var(--muted); font-size:11px;
+    }
+    @media (min-width:820px){
+      .grid{grid-template-columns: 1.2fr .8fr}
+      .criteria{grid-template-columns: 1fr 1fr}
+    }
+/* FIX: enable select interaction */
+select#symbol, select#timeframe {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+  -webkit-appearance: menulist;
+  appearance: menulist;
+  background-color: #0f0f12;
+}
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="title">
+      <h1>NO ENTRY</h1>
+      <div class="sub">Magisystem – Trade Decision by Consensus</div>
+    </div>
+    <div class="tagline">判断はあなたではない。<b>合議制AIが決定する。</b></div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- INPUT -->
+      <section class="card" aria-label="Input">
+        <div class="pill">Request Consensus（1つでも該当 → NO ENTRY）</div>
+
+        <div class="row two">
+          <div>
+            <label for="symbol">Symbol</label>
+<select id="symbol">
+  <option value="">選択（任意）</option>
+  <option value="USDJPY">USDJPY</option>
+  <option value="XAGUSD">XAGUSD</option>
+  <option value="XAUUSD">XAUUSD</option>
+  <option value="BTCUSD">BTCUSD</option>
+</select>
+          </div>
+          <div>
+            <label for="timeframe">Timeframe</label>
+            <select id="timeframe">
+              <option value="">選択（任意）</option>
+              <option>1m</option><option>3m</option><option>5m</option><option>15m</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="reason">Entry Reason（1行のみ・必須）</label>
+            <textarea id="reason" placeholder="なぜ今、入りたいのか（2行以上なら却下対象）"></textarea>
+            <div class="small">※ 2行以上 or 長文（目安90文字以上）は「説明過剰」として自動却下対象になります</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="pill">Rejection Criteria</div>
+        <div class="criteria" id="criteria"></div>
+
+        <div class="btnbar">
+          <button class="primary" id="btnEval">判定を依頼する</button>
+          <button class="ghost" id="btnReset" type="button">入力をクリア</button>
+        </div>
+
+        <!-- EVALUATING PHASE -->
+        <div class="phase" id="phaseBox">
+          <div class="p" id="phaseTitle"><b>Magisystem is evaluating…</b></div>
+          <div class="p" id="phaseLine">Do not interfere. Judgment is in progress.</div>
+        </div>
+      </section>
+
+      <!-- RESULT + LOGS -->
+      <section class="card" aria-label="Result and Logs">
+        <div class="result" id="resultArea">
+          <div class="banner" id="banner">
+            <p class="big" id="bigText">—</p>
+            <p class="subcopy" id="subText">判定はまだ実行されていません</p>
+          </div>
+
+          <div class="ai" id="aiArea" style="display:none;">
+            <div class="line"><span>MELCHIOR</span><span class="badge" id="st_m">—</span></div>
+            <div class="line"><span>BALTHASAR</span><span class="badge" id="st_b">—</span></div>
+            <div class="line"><span>CASPAR</span><span class="badge" id="st_c">—</span></div>
+          </div>
+
+          <div id="reasonBox" style="display:none;">
+            <div class="pill">Reasons</div>
+            <ul class="reasons" id="reasons"></ul>
+          </div>
+
+          <div class="btnbar" id="resultBtns" style="display:none;">
+            <button class="primary" id="btnSave">ログに記録する</button>
+            <button class="ghost" id="btnNew">新しい判断を行う</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="pill">Logs（最新200件）</div>
+          <div class="btnbar">
+            <button class="ghost" id="btnClearLogs" type="button">ログ全削除</button>
+          </div>
+          <div class="logs" id="logs"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <footer>
+    This system does not predict profits. It only prevents unnecessary trades. Trading is at your own risk.
+  </footer>
+
+<script>
+/** =========================
+ *  NO ENTRY – Minimal PWA
+ *  1 screen + result + logs
+ *  if-based logic, Magisystem flavor
+ *  ========================= */
+
+const CRITERIA = [
+  { id:"tf_mismatch", label:"時間足の不整合", desc:"エントリーと決済判断が、別の時間軸になっている", ai:"MELCHIOR", reasonShort:"Timeframe mismatch detected" },
+  { id:"momentum_dead", label:"勢いの欠如", desc:"形は良いが、直近の値動きが鈍い", ai:"BALTHASAR", reasonShort:"Momentum is weak" },
+  { id:"lot_focus", label:"ロット意識の発生", desc:"ロットを増減したい気持ちが先に出ている", ai:"CASPAR", reasonShort:"Position sizing emotion detected" },
+  { id:"over_explain", label:"説明過剰", desc:"理由を3つ以上、長く説明できてしまう", ai:"MELCHIOR", reasonShort:"Over-explaining detected" },
+  { id:"no_record", label:"記録拒否感", desc:"このトレードを後で見返したくない", ai:"CASPAR", reasonShort:"Avoiding accountability detected" },
+  { id:"hesitation", label:"迷い・違和感", desc:"入れるが、入りたくない感覚がある", ai:"CASPAR", reasonShort:"Hesitation signal detected" },
+];
+const AI_ORDER = ["MELCHIOR", "BALTHASAR", "CASPAR"];
+const LOG_KEY = "no_entry_logs_v1";
+
+const el = (id)=>document.getElementById(id);
+
+const criteriaWrap = el("criteria");
+CRITERIA.forEach(c=>{
+  const row = document.createElement("label");
+  row.className = "check";
+  row.innerHTML = `
+    <input type="checkbox" id="c_${c.id}" />
+    <div class="meta">
+      <div class="name"><b>${c.label}</b></div>
+      <div class="desc">${c.desc}</div>
+    </div>
+  `;
+  criteriaWrap.appendChild(row);
+});
+
+function normalizeReason(v){ return (v ?? "").trim().replace(/\s+$/g,""); }
+function isMultiLine(t){ return /\\r?\\n/.test(t); }
+
+function inferAutoFlags(entryReason){
+  const reason = normalizeReason(entryReason);
+  const tooLong = reason.length >= 90;
+  const auto = {};
+  if (isMultiLine(reason) || tooLong) auto.over_explain = true;
+  return auto;
+}
+
+function evaluateDecision({ symbol, timeframe, entryReason, flags }){
+  const reason = normalizeReason(entryReason);
+  if (!reason) return { ok:false, error:"Entry Reason（1行のみ）を入力してください" };
+
+  const manual = { ...(flags || {}) };
+  const auto = inferAutoFlags(reason);
+  const finalFlags = { ...manual };
+  Object.entries(auto).forEach(([k,v])=>{ if (v) finalFlags[k]=true; });
+
+  const triggered = CRITERIA.filter(c => finalFlags[c.id] === true);
+  const result = triggered.length ? "NO_ENTRY" : "ENTRY_ALLOWED";
+
+  const rejectedBySet = new Set(triggered.map(t=>t.ai));
+  const rejectedBy = AI_ORDER.filter(ai=>rejectedBySet.has(ai));
+  const reasons = triggered.map(t => `❌ ${t.reasonShort}`);
+
+  const aiStatus = { MELCHIOR:"Clear", BALTHASAR:"Clear", CASPAR:"Clear" };
+  if (result === "NO_ENTRY") rejectedBy.forEach(ai=> aiStatus[ai] = "Reject");
+
+  return {
+    ok:true,
+    payload:{
+      symbol:(symbol||"").trim(),
+      timeframe:(timeframe||"").trim(),
+      entryReason:reason,
+      finalFlags,
+      triggered,
+      result,
+      rejectedBy,
+      reasons,
+      aiStatus,
+      ts: Date.now(),
+    }
+  };
+}
+
+function loadLogs(){
+  try{ return JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); }
+  catch{ return []; }
+}
+function saveLog(payload){
+  const logs = loadLogs();
+  const id = (crypto?.randomUUID?.() || String(Math.random()).slice(2));
+  const item = {
+    id,
+    ts: payload.ts,
+    symbol: payload.symbol,
+    timeframe: payload.timeframe,
+    result: payload.result,
+    rejectedBy: payload.rejectedBy,
+    reasons: payload.reasons,
+    entryReason: payload.entryReason,
+  };
+  logs.unshift(item);
+  localStorage.setItem(LOG_KEY, JSON.stringify(logs.slice(0,200)));
+  return item;
+}
+function clearLogs(){ localStorage.removeItem(LOG_KEY); }
+
+function fmtDate(ts){
+  const d = new Date(ts);
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  const hh = String(d.getHours()).padStart(2,"0");
+  const mm = String(d.getMinutes()).padStart(2,"0");
+  return `${y}-${m}-${day} ${hh}:${mm}`;
+}
+
+function renderLogs(){
+  const wrap = el("logs");
+  const logs = loadLogs();
+  wrap.innerHTML = "";
+
+  if (!logs.length){
+    const div = document.createElement("div");
+    div.className = "small";
+    div.textContent = "ログはまだありません（判定→ログに記録する で保存）";
+    wrap.appendChild(div);
+    return;
+  }
+
+  logs.forEach(item=>{
+    const box = document.createElement("div");
+    box.className = "logitem";
+    const resText = (item.result === "NO_ENTRY") ? "NO ENTRY" : "ENTRY ALLOWED";
+    const resCls = (item.result === "NO_ENTRY") ? "bad" : "ok";
+    const who = (item.rejectedBy && item.rejectedBy.length) ? `Rejected by: ${item.rejectedBy.join(" / ")}` : "Consensus: Clear";
+    const sym = item.symbol || "—";
+    const tf = item.timeframe || "—";
+
+    box.innerHTML = `
+      <div class="logtop">
+        <div>
+          <p class="logtitle"><b>${sym}</b> <span class="small">(${tf})</span></p>
+          <div class="logmeta">${fmtDate(item.ts)} · ${who}</div>
+        </div>
+        <div class="logres ${resCls}">${resText}</div>
+      </div>
+      <div class="small">Reason: ${escapeHtml(item.entryReason).slice(0,140)}${item.entryReason.length>140?"…":""}</div>
+    `;
+    wrap.appendChild(box);
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+}
+
+function toast(msg){
+  const t = el("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+function setBanner(type, big, sub){
+  const banner = el("banner");
+  banner.className = "banner" + (type ? (" " + type) : "");
+  el("bigText").textContent = big;
+  el("subText").textContent = sub;
+}
+
+function setAIStatus(aiStatus){
+  const map = { MELCHIOR:"st_m", BALTHASAR:"st_b", CASPAR:"st_c" };
+  el("aiArea").style.display = "grid";
+  for (const [ai, st] of Object.entries(aiStatus)){
+    const target = el(map[ai]);
+    target.textContent = st;
+    target.className = "badge " + (st === "Reject" ? "bad" : "ok");
+  }
+}
+
+function setReasons(list){
+  const ul = el("reasons");
+  ul.innerHTML = "";
+  list.forEach(r=>{
+    const li = document.createElement("li");
+    li.textContent = r;
+    ul.appendChild(li);
+  });
+  el("reasonBox").style.display = list.length ? "block" : "none";
+}
+
+function showResultButtons(show){
+  el("resultBtns").style.display = show ? "flex" : "none";
+}
+
+let lastDecision = null;
+
+function gatherInput(){
+  const flags = {};
+  CRITERIA.forEach(c=>{
+    flags[c.id] = el("c_" + c.id).checked;
+  });
+  return {
+    symbol: el("symbol").value,
+    timeframe: el("timeframe").value,
+    entryReason: el("reason").value,
+    flags
+  };
+}
+
+function resetInput(){
+  el("symbol").value = "";
+  el("timeframe").value = "";
+  el("reason").value = "";
+  CRITERIA.forEach(c=> el("c_" + c.id).checked = false);
+  lastDecision = null;
+  setBanner("", "—", "判定はまだ実行されていません");
+  el("aiArea").style.display = "none";
+  el("reasonBox").style.display = "none";
+  showResultButtons(false);
+  el("phaseBox").classList.remove("show");
+}
+
+async function runMagisystemFlow(input){
+  const phaseBox = el("phaseBox");
+  const phaseLine = el("phaseLine");
+  phaseBox.classList.add("show");
+
+  // 演出（順番固定）
+  phaseLine.textContent = "MELCHIOR：時間軸とルール構造を検証中…";
+  await sleep(520);
+  phaseLine.textContent = "BALTHASAR：市場の勢いと参加状況を分析中…";
+  await sleep(680);
+  phaseLine.textContent = "CASPAR：感情介入・迷いの兆候を監視中…";
+  await sleep(640);
+
+  const res = evaluateDecision(input);
+
+  await sleep(220);
+  phaseBox.classList.remove("show");
+  return res;
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+el("btnEval").addEventListener("click", async ()=>{
+  const input = gatherInput();
+  const res = await runMagisystemFlow(input);
+
+  if (!res.ok){
+    toast(res.error);
+    setBanner("bad", "—", res.error);
+    el("aiArea").style.display = "none";
+    el("reasonBox").style.display = "none";
+    showResultButtons(false);
+    return;
+  }
+
+  lastDecision = res.payload;
+
+  if (lastDecision.result === "NO_ENTRY"){
+    setBanner("bad", "NO ENTRY", "このトレードは却下されました");
+    setAIStatus(lastDecision.aiStatus);
+    setReasons(lastDecision.reasons.length ? lastDecision.reasons : ["❌ Rejection criteria detected"]);
+  } else {
+    setBanner("ok", "ENTRY ALLOWED", "却下条件は検出されませんでした");
+    setAIStatus(lastDecision.aiStatus);
+    setReasons([]);
+  }
+
+  showResultButtons(true);
+});
+
+el("btnSave").addEventListener("click", ()=>{
+  if (!lastDecision){
+    toast("先に判定を実行してください");
+    return;
+  }
+  saveLog(lastDecision);
+  renderLogs();
+  toast("Decision Logged");
+});
+
+el("btnNew").addEventListener("click", ()=>{
+  toast("新しい判断を開始します");
+  // 入力は残してもOKだが、判定だけクリアする
+  lastDecision = null;
+  setBanner("", "—", "判定はまだ実行されていません");
+  el("aiArea").style.display = "none";
+  el("reasonBox").style.display = "none";
+  showResultButtons(false);
+});
+
+el("btnReset").addEventListener("click", ()=>{
+  resetInput();
+  toast("入力をクリアしました");
+});
+
+el("btnClearLogs").addEventListener("click", ()=>{
+  clearLogs();
+  renderLogs();
+  toast("ログを全削除しました");
+});
+
+// 初期レンダリング
+renderLogs();
+
+// PWA: service worker
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try { await navigator.serviceWorker.register("./sw.js"); }
+    catch (e) { /* ignore */ }
+  });
+}
+</script>
+</body>
+</html>
